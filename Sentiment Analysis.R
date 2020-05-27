@@ -13,14 +13,16 @@ library('wordcloud2')  # Enhanced Wordcloud using Data Frame
 
 ## Read data
 ReadData <- function() {
-  csv.file = read.csv(file.choose(), header = TRUE)
-  tweets <- iconv(csv.file$text, to = "utf-8")
+  print("Select your file, Sir.")
+  csv.file <<- read.csv(file.choose(), header = TRUE)
+  tweets <<- iconv(csv.file$text, to = "utf-8")
 }
 
 ## Build Corpus
-BuildCorpus <- function(file) {
-  corpus <- iconv(file$text, to = "utf-8") #converting encoding
-  corpus <- Corpus(VectorSource(corpus))
+BuildCorpus <- function(csv.file) {
+  print("We are making a corpus, Sir.")
+  corpus <<- iconv(csv.file$text, to = "utf-8") #converting encoding
+  corpus <<- Corpus(VectorSource(corpus))
 }
 
 # Remove URL using Regex
@@ -29,30 +31,33 @@ RemoveURL <- function(x) {
 }
 
 ## Clean Corpus
-CleanCorpus <- function(corpus) {
-  corpus <- tm_map(corpus, tolower) 
-  corpus <- tm_map(corpus, removePunctuation)
-  corpus <- tm_map(corpus, removeNumbers)
-  cleanset <- tm_map(corpus, removeWords, stopwords(kind = "en"))
-  cleanset <- tm_map(cleanset, content_transformer(RemoveURL))
-  cleanset <-
+CleanCorpus <<- function(corpus) {
+  print("We are cleaning this corpus, Sir.")
+  corpus <<- tm_map(corpus, tolower) 
+  corpus <<- tm_map(corpus, removePunctuation)
+  corpus <<- tm_map(corpus, removeNumbers)
+  cleanset <<- tm_map(corpus, removeWords, stopwords(kind = "en"))
+  cleanset <<- tm_map(cleanset, content_transformer(RemoveURL))
+  cleanset <<-
     tm_map(cleanset, removeWords, c('aapl', 'apple', 'apples'))
-  cleanset <- tm_map(cleanset, gsub,
+  cleanset <<- tm_map(cleanset, gsub,
                      pattern = 'iphones',
                      replacement = 'iphone')
-  cleanset <- tm_map(cleanset, stripWhitespace)
+  cleanset <<- tm_map(cleanset, stripWhitespace)
 }
 
 ## Term-document Matrix
-CreateTDMatrix <- function(cleanset) {
-  tdm <- TermDocumentMatrix(cleanset)
-  tdm <- as.matrix(tdm)
+CreateTDMatrix <<- function(cleanset) {
+  print("Turning your cleaned dataset into TDM, Sir.")
+  tdm <<- TermDocumentMatrix(cleanset)
+  tdm <<- as.matrix(tdm)
 }
 
 ## Trending Words Bar
 CreateTrendingBar <- function(tdm) {
-  w <- rowSums(tdm)
-  w <- subset(w, w >= 25)
+  print("Creating and saving your graph, Sir.")
+  w <<- rowSums(tdm)
+  w <<- subset(w, w >= 25)
   png(file = 'Output/trending_words_bar.png')
   barplot (w,
            las = 2,
@@ -62,7 +67,8 @@ CreateTrendingBar <- function(tdm) {
 
 ## Word Cloud 1
 CreateWordCloud <- function(tdm) {
-  w <- sort(rowSums(tdm), decreasing = TRUE)
+  print("Creating the first word count, Sir.")
+  w <<- sort(rowSums(tdm), decreasing = TRUE)
   set.seed(100)
   png(file = 'Output/trending_word1.png')
   wordcloud(
@@ -79,8 +85,9 @@ CreateWordCloud <- function(tdm) {
 
 ## Word Cloud 2
 CreateWordCloud2 <- function(tdm) {
-  w <- data.frame(names(w), w)
-  colnames(w) <- c('word', 'freq')
+  print("Creating the second word count, Sir.")
+  w <<- data.frame(names(w), w)
+  colnames(w) <<- c('word', 'freq')
   head(w)
   
   png(file = 'Output/trending_word2.png')
@@ -96,6 +103,7 @@ CreateWordCloud2 <- function(tdm) {
 
 ## Sentiment Scoring Bar Plot
 CreateSentimentBar <- function(tweets) {
+  print("Creating the sentiment bar, Sir.")
   # Obtain sentiment scores
   sentiment <- get_nrc_sentiment(tweets)
   # Viz
